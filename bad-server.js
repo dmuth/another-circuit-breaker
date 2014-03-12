@@ -15,12 +15,18 @@ winston.add(winston.transports.Console, {
 function startServer(port, data) {
 
 	var app = express();
+
 	app.get("/", function(req, res){
 		if (data.bad) {
-			res.send("BAD\n", 500);
+			setTimeout(function() {
+				res.send("BAD\n", 500);
+				}, data.goBadDelay);
+
 		} else {
 			res.send("GOOD\n");
+
 		}
+
 	});
 
 	var server = app.listen(port, function() {
@@ -34,6 +40,7 @@ function startServer(port, data) {
 * Set our webserver in "bad" mode after a delay.
 */
 function timeoutGoBad(data) {
+
 	setTimeout(function() {
 		data.bad = true;
 		winston.warn("Webserver is now in BAD mode!");
@@ -47,11 +54,13 @@ function timeoutGoBad(data) {
 * Set our webserver in "good" mode after a delay
 */
 function timeoutGoGood(data) {
+
 	setTimeout(function() {
 		data.bad = false;
 		winston.info("Webserver is now in GOOD mode!");
 		timeoutGoBad(data);
 		}, data.goBadDuration);
+
 } // End of timeoutGoGood()
 
 
