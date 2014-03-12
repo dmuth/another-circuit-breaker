@@ -26,13 +26,13 @@ function handleRequest(req, res, url) {
 
 		if (beenhere) {
 			//
-			// If we've been here before AND this was called as a response
-			// from request(), then this is a "late" reply.
+			// Too little, too late.
 			//
-			if (response) {
-				process.stdout.write("L");
-			}
 			return(null);
+		}
+
+		if (!response) {
+			process.stdout.write("T");
 		}
 
 		process.stdout.write("R");
@@ -84,7 +84,7 @@ function startServer(port, url) {
 		console.log("D = Data Received from bad web service");
 		console.log("E = Error received from bad web service");
 		console.log("R = Response sent to client");
-		console.log("L = Late response from bad web service");
+		console.log("T = Timeout from bad web service");
 		console.log("5 = Error received from the bad web service");
 		console.log();
 	});
