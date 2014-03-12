@@ -7,6 +7,9 @@
   "license": "BSD",
   "dependencies": {
     "request": "~2.34.0",
-    "commander": "~2.1.0"
+    "commander": "~2.1.0",
+    "winston": "~0.7.2",
+    "express": "~3.5.0",
+    "async": "~0.2.10"
   }
 }
