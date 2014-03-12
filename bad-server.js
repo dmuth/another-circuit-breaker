@@ -23,7 +23,13 @@ function startServer(port, data) {
 				}, data.goBadDelay);
 
 		} else {
-			res.send("GOOD\n");
+			//
+			// Even if the state of the server is good, take 100 ms to reply to 
+			// simulate a normal remote service.
+			//
+			setTimeout(function() {
+				res.send("GOOD\n");
+			}, 100);
 
 		}
 
