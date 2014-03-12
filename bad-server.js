@@ -19,7 +19,7 @@ function startServer(port, data) {
 	app.get("/", function(req, res){
 		if (data.bad) {
 			setTimeout(function() {
-				res.send("BAD\n", 500);
+				res.send("BAD\n");
 				}, data.goBadDelay);
 
 		} else {
