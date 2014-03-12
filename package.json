@@ -11,6 +11,6 @@
     "winston": "~0.7.2",
     "express": "~3.5.0",
     "async": "~0.2.10",
-    "node-pool": "0.0.3"
+    "generic-pool": "~2.0.4"
   }
 }
