@@ -1,3 +1,10 @@
+/**
+* Our bad server.  This server will periodically go "bad", and responses 
+* will take a very long time.
+*/
+
+
+var util = require("util");
 
 var express = require("express");
 var commander = require("commander");
@@ -8,6 +15,7 @@ winston.add(winston.transports.Console, {
 	colorize: true,
 	timestamp: true,
 	});
+
 
 /**
 * Start up our webserver.
@@ -85,6 +93,12 @@ function main() {
 	commander.goBadDuration = commander.goBadDuration || 5;
 	commander.goBadDelay = commander.goBadDelay || 5;
 
+	console.log(util.format(
+		"Starting server.\nIt will go bad after: %d seconds\n"
+	 	+ "It will stay bad for: %d seconds\n"
+		+ "While bad the response delay will be: %d seconds\n",
+		commander.goBadAfter, commander.goBadDuration, commander.goBadDelay));
+	
 	var port = 3001;
 	var data = {};
 	data.goBadAfter = commander.goBadAfter * 1000;
