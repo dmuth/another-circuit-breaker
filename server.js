@@ -46,17 +46,25 @@ function handleRequest(req, res, url) {
 	request(url, function(error, result, body) {
 
 		if (error) {
-			console.log(error);
-			process.stdout.write("E");
+			//
+			// Connection refused or similar sort of error. 
+			// We don't expect these during our demo.
+			//
+			process.stdout.write("X");
+			res.send("Error " + JSON.stringify(error), 200);
+
+		} else {
+
+			if (result.statusCode != 200) {
+				process.stdout.write("E");
+
+			} else {
+				process.stdout.write("D");
+
+			}
+
 		}
 
-		if (result.statusCode != 200) {
-			process.stdout.write("5");
-			res.send("Hello", 200);
-			return(null);
-		}
-
-		process.stdout.write("D");
 		done(true);
 
 	});
@@ -82,10 +90,10 @@ function startServer(port, url) {
 		console.log();
 		console.log("Key:");
 		console.log("D = Data Received from bad web service");
-		console.log("E = Error received from bad web service");
+		console.log("X = Connection error received from bad web service");
 		console.log("R = Response sent to client");
 		console.log("T = Timeout from bad web service");
-		console.log("5 = Error received from the bad web service");
+		console.log("E = HTTP Error received from the bad web service");
 		console.log();
 	});
 
