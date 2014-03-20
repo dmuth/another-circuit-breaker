@@ -1,0 +1,43 @@
+#
+# This screenrc file is intended for development.
+# To start up screen using this screenrc:
+#
+#	screen -c ./screenrc
+#
+
+#
+# Set up a useful caption
+#
+caption always "%{= kG} [%Y%m%d %c]: %-Lw%{= bW}%50<%n%f* %t%{-}%+Lw%>"
+
+shelltitle OS/X
+
+#
+# This will split the the screen twice and set the focus to each of the apps
+#
+screen -t "Dev" 6
+screen -t "Bad Server Dev" 0
+screen -t "Good Server Dev" 2
+screen -t "Client Dev" 4
+
+split
+screen -t "Bad Server" 1
+focus
+
+split
+screen -t "Good Server" 3
+focus
+
+screen -t "Client " 5
+focus
+
+#
+# Change our meta key
+#
+escape ^x^x
+
+#
+# Don't show the startup message
+#
+startup_message off
+
