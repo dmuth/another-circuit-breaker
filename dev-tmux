@@ -1,0 +1,19 @@
+#!/bin/sh 
+
+
+tmux new-session -d -s "CircuitBreaker" bash
+
+#tmux split-window -v 
+#tmux split-window -h
+
+tmux split-window -v -p 50 bash
+tmux split-window -h -t 0 -p 50 bash
+tmux resize-pane -U 10
+
+tmux neww -n Dev bash
+tmux split-window -h -p 50 bash
+
+tmux select-window -t 0
+
+tmux attach
+
