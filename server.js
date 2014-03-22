@@ -1,7 +1,19 @@
+/**
+* Our public-facing webserver which talks to a back end service.
+*/
+
+var http = require("http");
 
 var commander = require("commander");
 var express = require("express");
 var request = require("request");
+
+var stats = require("./stats");
+
+//
+// Increase our maximum number of sockets
+//
+http.globalAgent.maxSockets = 1000;
 
 
 /**
@@ -23,7 +35,6 @@ function handleRequest(req, res, url) {
 
 	var done = function(response) {
 
-
 		if (beenhere) {
 			//
 			// Too little, too late.
@@ -32,10 +43,10 @@ function handleRequest(req, res, url) {
 		}
 
 		if (!response) {
-			process.stdout.write("T");
+			stats.incr("bad-server-timeout");
+
 		}
 
-		process.stdout.write("R");
 		res.send("Hello", 200);
 		beenhere = true;
 
@@ -43,23 +54,26 @@ function handleRequest(req, res, url) {
 
 	setTimeout(done, 500);
 
+	stats.incr("connecting");
+
 	request(url, function(error, result, body) {
+		stats.decr("connecting");
 
 		if (error) {
 			//
 			// Connection refused or similar sort of error. 
 			// We don't expect these during our demo.
 			//
-			process.stdout.write("X");
 			res.send("Error " + JSON.stringify(error), 200);
+			stats.incr("http-error-" + error.errno);
 
 		} else {
 
 			if (result.statusCode != 200) {
-				process.stdout.write("E");
+				stats.incr("http-error-" + result.statusCode);
 
 			} else {
-				process.stdout.write("D");
+				stats.incr("success");
 
 			}
 
@@ -88,13 +102,6 @@ function startServer(port, url) {
 	var server = app.listen(port, function() {
 		console.log("Listening on port " + port);
 		console.log();
-		console.log("Key:");
-		console.log("D = Data Received from bad web service");
-		console.log("X = Connection error received from bad web service");
-		console.log("R = Response sent to client");
-		console.log("T = Timeout from bad web service");
-		console.log("E = HTTP Error received from the bad web service");
-		console.log();
 	});
 
 } // End of startServer()
@@ -110,6 +117,8 @@ function main() {
 		.parse(process.argv)
 		;
 	var url = commander.url || "http://localhost:3001/";
+
+	stats.reportTime();
 
 	var port = 3000;
 	startServer(port, url);
