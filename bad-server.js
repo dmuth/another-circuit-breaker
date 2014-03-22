@@ -4,17 +4,30 @@
 */
 
 
+var http = require("http");
 var util = require("util");
 
 var express = require("express");
 var commander = require("commander");
 var winston = require("winston");
 
+var stats = require("./stats");
+
+
+//
+// Set up logging
+//
 winston.clear(winston.transports.Console);
 winston.add(winston.transports.Console, {
 	colorize: true,
 	timestamp: true,
 	});
+
+
+//
+// Increase our maximum number of sockets
+//
+http.globalAgent.maxSockets = 1000;
 
 
 /**
@@ -25,8 +38,13 @@ function startServer(port, data) {
 	var app = express();
 
 	app.get("/", function(req, res){
+
+		stats.incr("pending");
+
 		if (data.bad) {
 			setTimeout(function() {
+				stats.decr("pending");
+				stats.incr("results-bad");
 				res.send("BAD\n");
 				}, data.goBadDelay);
 
@@ -36,6 +54,8 @@ function startServer(port, data) {
 			// simulate a normal remote service.
 			//
 			setTimeout(function() {
+				stats.decr("pending");
+				stats.incr("results-good");
 				res.send("GOOD\n");
 			}, 100);
 
@@ -92,6 +112,8 @@ function main() {
 	commander.goBadAfter = commander.goBadAfter || 5;
 	commander.goBadDuration = commander.goBadDuration || 5;
 	commander.goBadDelay = commander.goBadDelay || 5;
+
+	stats.reportTime();
 
 	console.log(util.format(
 		"Starting server.\nIt will go bad after: %d seconds\n"
