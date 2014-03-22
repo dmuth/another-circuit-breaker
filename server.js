@@ -120,6 +120,10 @@ function main() {
 
 	stats.reportTime();
 
+	process.on("uncaughtException", function(error) {
+		stats.incr("uncaught-exception-" + error.errno);
+	});
+
 	var port = 3000;
 	startServer(port, url);
 
