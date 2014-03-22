@@ -54,7 +54,12 @@ exports.reportTime = function() {
 * Print out our stats, then schedule another run.
 */
 function reportStats() {
-	console.log(data);
+	var str = JSON.stringify(data);
+	str = str.replace(/{/, "{ ");
+	str = str.replace(/,/g, ", ");
+	str = str.replace(/:/g, ": ");
+	str = str.replace(/}/, " }");
+	console.log(str);
 	exports.reportTime();
 }
 
