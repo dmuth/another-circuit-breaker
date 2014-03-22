@@ -1,7 +1,21 @@
+/**
+* Our client app.  It will be used for talking to the good server.
+*/
+
+var http = require("http");
+var util = require("util");
 
 var commander = require("commander");
 var generic_pool = require("generic-pool");
 var request = require("request");
+
+var stats = require("./stats");
+
+
+//
+// Increase our maximum number of sockets
+//
+http.globalAgent.maxSockets = 1000;
 
 
 /**
@@ -16,9 +30,16 @@ function main() {
 		.parse(process.argv)
 		;
 
-	var url = commander.url || "http://localhost:3000/";
+	commander.numRequests = commander.numRequests || 10;
+	commander.concurrency = commander.concurrency || 1;
+	commander.url = commander.url || "http://localhost:3000/";
 
-	console.log("Hammering URL:", url);
+	console.log(util.format(
+		"Hammering URL: %s\nNumber of requests: %d\nConcurrency: %d\n",
+		commander.url, commander.numRequests, commander.concurrency
+		));
+
+	stats.reportTime();
 
 	var pool = generic_pool.Pool({
 		name: "pool",
@@ -34,19 +55,25 @@ function main() {
 
 		pool.acquire(function() {
 
-			request(url, function(error, res, body) {
+			stats.incr("connecting");
+			request(commander.url, function(error, res, body) {
+				stats.decr("connecting");
 
 				if (error) {
-					console.log(error);
+					stats.incr("error");
+					stats.incr("error-" + error.errno);
+					//console.log(error);
+
 				} else {
-					process.stdout.write(".");
+					stats.incr("success");
+
 				}
 
 				pool.release();
 
 				requests_left--;
 				if (requests_left <= 0) {
-					process.exit(0);
+					console.log("No requests left to send. Hit Ctrl-C to exit..");
 				}
 
 			});
