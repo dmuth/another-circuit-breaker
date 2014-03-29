@@ -202,12 +202,20 @@ function main() {
 	commander
 		.option("--url <url>", "Url of the bad web service")
 		.option("--clever", "Be 'clever' when handling timeouts from the bad service")
+		.option("--stats-avg", "Compute average response time")
+		.option("--stats-stddev", "Compute standard deviation in response time")
 		.parse(process.argv)
 		;
 	var url = commander.url || "http://localhost:3001/";
 
-	stats.setAvg("request_time");
-	stats.setStdDev("request_time");
+	if (commander.statsAvg) {
+		stats.setAvg("request_time");
+	}
+
+	if (commander.statsStddev) {
+		stats.setStdDev("request_time");
+	}
+
 	stats.reportTime();
 
 	process.on("uncaughtException", function(error) {

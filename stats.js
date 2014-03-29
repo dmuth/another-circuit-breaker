@@ -105,41 +105,47 @@ function computeStats(data) {
 	//
 	for (var k in data) {
 
-		//
-		// Determine the average
-		//
-		if (meta_data[k] && meta_data[k]["avg"]) {
+		if (meta_data[k]) {
 
 			var values = data[k];
 
-			var sum = 0;
-			for (var i = 0; i<values.length; i++) {
-				sum += values[i];
+			//
+			// Determine the average
+			//
+			if (meta_data[k]["avg"]) {
+
+
+				var sum = 0;
+				for (var i = 0; i<values.length; i++) {
+					sum += values[i];
+				}
+
+				var average = sum / values.length;
+				average = Math.floor(average * 1000) / 1000;
+				data[k + "-avg"] = average;
+
+				delete data[k];
 			}
 
-			var average = sum / values.length;
-			average = Math.floor(average * 1000) / 1000;
-			data[k + "-avg"] = average;
+			//
+			// Now determine standard deviation
+			//
+			if (meta_data[k]["stddev"]) {
 
-		}
+				var sum = 0;
+				for (var i = 0; i<values.length; i++) {
+					sum += values[i] * values[i];
+				}
 
-		//
-		// Now determine standard deviation
-		//
-		if (meta_data[k] && meta_data[k]["stddev"]) {
+				var variance = sum / values.length;
+				variance = Math.floor(variance * 1000) / 1000;
+				var stddev = Math.sqrt(variance);
+				stddev = Math.floor(stddev * 1000) / 1000;
 
-			var sum = 0;
-			for (var i = 0; i<values.length; i++) {
-				sum += values[i] * values[i];
+				//local_data[k + "-var"] = variance;
+				data[k + "-stddev"] = stddev;
+
 			}
-
-			var variance = sum / values.length;
-			variance = Math.floor(variance * 1000) / 1000;
-			var stddev = Math.sqrt(variance);
-			stddev = Math.floor(stddev * 1000) / 1000;
-
-			//local_data[k + "-var"] = variance;
-			data[k + "-stddev"] = stddev;
 
 			delete data[k];
 
@@ -151,12 +157,29 @@ function computeStats(data) {
 
 
 /**
+* Filter out any lists we have.
+*
+* @param {object} data Our array of stats data.  This will be modified in place.
+*/
+function filterLists(data) {
+
+	for (var k in data) {
+		if (Array.isArray(data[k])) {
+			delete data[k];
+		}
+	}
+
+} // End of filterLists()
+
+
+/**
 * Print out our stats, then schedule another run.
 */
 function reportStats() {
 
 	var local_data = JSON.parse(JSON.stringify(data));
 	computeStats(local_data);
+	filterLists(local_data);
 
 	var str = JSON.stringify(local_data);
 	str = str.replace(/{/, "{ ");
