@@ -27,7 +27,7 @@ winston.add(winston.transports.Console, {
 //
 // Increase our maximum number of sockets
 //
-http.globalAgent.maxSockets = 1000;
+http.globalAgent.maxSockets = 10240;
 
 
 /**

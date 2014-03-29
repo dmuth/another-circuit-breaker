@@ -13,7 +13,7 @@ var stats = require("./stats");
 //
 // Increase our maximum number of sockets
 //
-http.globalAgent.maxSockets = 1000;
+http.globalAgent.maxSockets = 10240;
 
 
 /**
@@ -164,9 +164,13 @@ function startServer(port, url, clever) {
 	var server = app.listen(port, function() {
 		console.log("Listening on port " + port);
 		if (clever) {
-			console.log("Handling requests in a 'clever' manner.");
+			console.log("Handling requests in a 'clever' manner. "
+			+ "(Return HTTP 200 after 500 timeout.)"
+			);
+
 		} else {
 			console.log("Handling requests in a 'naive' manner.");
+
 		}
 
 		console.log();
