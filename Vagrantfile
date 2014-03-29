@@ -16,6 +16,14 @@ Vagrant.configure("2") do |config|
 		host.vm.network "private_network", ip: "10.0.50.10"
 		host.vm.graceful_halt_timeout = 10
 
+		#
+		# We don't need too much RAM here, and 1 CPU will do nicely.
+		#
+		config.vm.provider "virtualbox" do |v|
+			v.memory = 256
+			v.cpus = 1
+		end
+
 	end
 
 	config.vm.define :good_server do |host|
@@ -25,6 +33,11 @@ Vagrant.configure("2") do |config|
 		host.vm.network "private_network", ip: "10.0.50.11"
 		host.vm.graceful_halt_timeout = 10
 
+		config.vm.provider "virtualbox" do |v|
+			v.memory = 256
+			v.cpus = 1
+		end
+
 	end
 
 	config.vm.define :client do |host|
@@ -33,6 +46,11 @@ Vagrant.configure("2") do |config|
   
 		host.vm.network "private_network", ip: "10.0.50.12"
 		host.vm.graceful_halt_timeout = 10
+
+		config.vm.provider "virtualbox" do |v|
+			v.memory = 256
+			v.cpus = 1
+		end
 
 	end
 
