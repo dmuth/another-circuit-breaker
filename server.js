@@ -29,11 +29,22 @@ http.globalAgent.maxSockets = 10240;
 */
 function handleRequest(req, res, url, clever) {
 
+	//
+	// Callback to determine amount of time spent
+	//
+	var start = new Date().getTime();
+	function cb() {
+		var finish = new Date().getTime();
+		var diff = (finish - start) / 1000;
+		stats.add("request_time", diff);
+
+	}
+
 	if (clever) {
-		handleRequestClever(req, res, url);
+		handleRequestClever(req, res, url, cb);
 
 	} else {
-		handleRequestNaive(req, res, url);
+		handleRequestNaive(req, res, url, cb);
 
 	}
 		
@@ -43,7 +54,7 @@ function handleRequest(req, res, url, clever) {
 /**
 * Try to handle our request in a "clever" way.
 */
-function handleRequestClever(req, res, url) {
+function handleRequestClever(req, res, url, cb) {
 
 	//
 	// This is something an overly clever node.js programmer might do.
@@ -70,6 +81,7 @@ function handleRequestClever(req, res, url) {
 		}
 
 		res.send("Hello", 200);
+		cb();
 
 	}
 
@@ -87,6 +99,7 @@ function handleRequestClever(req, res, url) {
 			//
 			res.send("Error " + JSON.stringify(error), 200);
 			stats.incr("http-error-" + error.errno);
+			cb();
 
 		} else {
 
@@ -99,6 +112,7 @@ function handleRequestClever(req, res, url) {
 			}
 
 			res.send("Hello", 200);
+			cb();
 
 		}
 
@@ -113,8 +127,7 @@ function handleRequestClever(req, res, url) {
 * Try to handle our request in a "naive" way. 
 * Simply wait as long as is necessary for the response.
 */
-function handleRequestNaive(req, res, url) {
-
+function handleRequestNaive(req, res, url, cb) {
 
 	stats.incr("connecting");
 
@@ -128,6 +141,7 @@ function handleRequestNaive(req, res, url) {
 			//
 			res.send("Error " + JSON.stringify(error), 200);
 			stats.incr("http-error-" + error.errno);
+			cb();
 
 		} else {
 
@@ -140,6 +154,7 @@ function handleRequestNaive(req, res, url) {
 			}
 
 			res.send("Hello", 200);
+			cb();
 
 		}
 
@@ -191,6 +206,8 @@ function main() {
 		;
 	var url = commander.url || "http://localhost:3001/";
 
+	stats.setAvg("request_time");
+	stats.setStdDev("request_time");
 	stats.reportTime();
 
 	process.on("uncaughtException", function(error) {
