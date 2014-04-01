@@ -8,7 +8,10 @@ var commander = require("commander");
 var express = require("express");
 var request = require("request");
 
+var circuitBreaker = require("./lib/circuitBreaker");
 var stats = require("./stats");
+var request_local = require("./lib/request");
+
 
 //
 // Increase our maximum number of sockets
@@ -25,19 +28,20 @@ http.globalAgent.maxSockets = 10240;
 * @param {boolean} clever Do we want to be "clever" when waiting on a 
 *	response from the bad server? This is useful when we want to make 
 *	connections to the bad server
+* @param {object} cb_in Our callback
 *
 */
-function handleRequest(req, res, url, clever) {
+function handleRequest(req, res, url, clever, cb_in) {
 
 	//
 	// Callback to determine amount of time spent
 	//
 	var start = new Date().getTime();
-	function cb() {
+	function cb(error) {
 		var finish = new Date().getTime();
 		var diff = (finish - start) / 1000;
 		stats.add("request_time", diff);
-
+		cb_in(error);
 	}
 
 	if (clever) {
@@ -80,8 +84,8 @@ function handleRequestClever(req, res, url, cb) {
 			stats.incr("bad-server-timeout");
 		}
 
-		res.send("Hello", 200);
-		cb();
+		//res.send("Hello", 200);
+		cb("bad-server-timeout");
 
 	}
 
@@ -97,22 +101,23 @@ function handleRequestClever(req, res, url, cb) {
 			// Connection refused or similar sort of error. 
 			// We don't expect these during our demo.
 			//
-			res.send("Error " + JSON.stringify(error), 200);
+			//res.send("Error " + JSON.stringify(error), 200);
 			stats.incr("http-error-" + error.errno);
-			cb();
+			cb("http-error-" + error.errno);
 
 		} else {
 
 			if (result.statusCode != 200) {
 				stats.incr("http-error-" + result.statusCode);
+				//res.send("Hello", 200);
+				cb("http-error-" + result.statusCode);
 
 			} else {
 				stats.incr("success");
+				//res.send("Hello", 200);
+				cb();
 
 			}
-
-			res.send("Hello", 200);
-			cb();
 
 		}
 
@@ -139,22 +144,23 @@ function handleRequestNaive(req, res, url, cb) {
 			// Connection refused or similar sort of error. 
 			// We don't expect these during our demo.
 			//
-			res.send("Error " + JSON.stringify(error), 200);
+			//res.send("Error " + JSON.stringify(error), 200);
 			stats.incr("http-error-" + error.errno);
-			cb();
+			cb("http-error-" + error.errno);
 
 		} else {
 
 			if (result.statusCode != 200) {
 				stats.incr("http-error-" + result.statusCode);
+				//res.send("Hello", 200);
+				cb("http-error-" + result.statusCode);
 
 			} else {
 				stats.incr("success");
+				//res.send("Hello", 200);
+				cb();
 
 			}
-
-			res.send("Hello", 200);
-			cb();
 
 		}
 
@@ -166,19 +172,45 @@ function handleRequestNaive(req, res, url, cb) {
 /**
 * Start up our webserver.
 */
-function startServer(port, url, clever) {
+function startServer(port, commander) {
 
 	var app = express();
 
-	console.log("URL of bad web service is:", url);
+	console.log("URL of bad web service is:", commander.url);
+
+	var options = {};
+	options.timeout = commander.circuitBreakerTimeout;
+	options.maxFailures = commander.circuitBreakerMaxFailures;
+	options.min = commander.circuitBreakerMin;
+	options.decayRate = commander.circuitBreakerDecayRate;
+	options.debug = true;
+
+	var breaker = new circuitBreaker(options);
 
 	app.get("/", function(req, res) {
-		handleRequest(req, res, url, clever);
+
+		if (commander.circuitBreaker) {
+			breaker.go(function(cb) {
+				handleRequest(req, res, commander.url, commander.clever, cb);
+				},
+			function(error) {
+				//console.log("After!", error); // Debugging
+				res.send("Hello", 200);
+				});
+
+		} else {
+			handleRequest(req, res, commander.url, commander.clever, function() {
+				res.send("Hello", 200);
+				});
+
+		}
+
 		});
 
 	var server = app.listen(port, function() {
 		console.log("Listening on port " + port);
-		if (clever) {
+
+		if (commander.clever) {
 			console.log("Handling requests in a 'clever' manner. "
 			+ "(Return HTTP 200 after 500 timeout.)"
 			);
@@ -204,9 +236,26 @@ function main() {
 		.option("--clever", "Be 'clever' when handling timeouts from the bad service")
 		.option("--stats-avg", "Compute average response time")
 		.option("--stats-stddev", "Compute standard deviation in response time")
+		.option("--circuit-breaker", "Use the 'circuit breaker' functionality")
+		.option("--circuit-breaker-timeout", "Max length of a request in seconds")
+		.option("--circuit-breaker-max-failures <n>", 
+			"Number of failures before tripping the circuit breaker")
+		.option("--circuit-breaker-min <n>", 
+			"Failures must be below this number before retrying on an open circuit")
+		.option("--circuit-breaker-decay-rate <n>",
+			"Errors drop by this number per second")
 		.parse(process.argv)
 		;
-	var url = commander.url || "http://localhost:3001/";
+	//console.log(commander); // Debugging
+
+	//
+	// Set defaults
+	//
+	commander.url = commander.url || "http://localhost:3001/";
+	commander.circuitBreakerTimeout = commander.circuitBreakerTimeout || 1;
+	commander.circuitBreakerMaxFailures = commander.circuitBreakerMaxFailures || 10;
+	commander.circuitBreakerMin = commander.circuitBreakerMin || 0;
+	commander.circuitBreakerDecayRate = commander.circuitBreakerDecayRate || 1;
 
 	if (commander.statsAvg) {
 		stats.setAvg("request_time");
@@ -219,11 +268,12 @@ function main() {
 	stats.reportTime();
 
 	process.on("uncaughtException", function(error) {
+		//console.log(error, JSON.stringify(error)); // Debugging
 		stats.incr("uncaught-exception-" + error.errno);
 	});
 
 	var port = 3000;
-	startServer(port, url, commander.clever);
+	startServer(port, commander);
 
 } // End of main()
 
