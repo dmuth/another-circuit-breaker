@@ -8,7 +8,7 @@ var commander = require("commander");
 var express = require("express");
 
 var circuitBreaker = require("./lib/circuitBreaker");
-var stats = require("./stats");
+var stats = require("./lib/stats");
 var request = require("./lib/request");
 
 

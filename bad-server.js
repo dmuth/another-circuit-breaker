@@ -11,7 +11,7 @@ var express = require("express");
 var commander = require("commander");
 var winston = require("winston");
 
-var stats = require("./stats");
+var stats = require("./lib/stats");
 
 
 //
