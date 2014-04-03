@@ -33,6 +33,7 @@ function startServer(stats, port, commander) {
 	options.min = commander.circuitBreakerMin;
 	options.decayRate = commander.circuitBreakerDecayRate;
 	options.debug = true;
+	//options.debug = function(str) { console.log("CB DEBUG:", str); };
 
 	var breaker = new circuitBreaker(options);
 
