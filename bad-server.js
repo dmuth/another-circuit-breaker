@@ -115,7 +115,9 @@ function main() {
 	commander.goBadDuration = commander.goBadDuration || 5;
 	commander.goBadDelay = commander.goBadDelay || 5;
 
-	stats.reportTime();
+	stats.reportTime(function(str) {
+		console.log("Bad Server:", str);
+		});
 
 	console.log(util.format(
 		"Starting server.\nIt will go bad after: %d seconds\n"

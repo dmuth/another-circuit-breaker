@@ -41,7 +41,9 @@ function main() {
 		commander.url, commander.numRequests, commander.concurrency
 		));
 
-	stats.reportTime();
+	stats.reportTime(function(str) {
+		console.log("Client:", str);
+		});
 
 	var pool = generic_pool.Pool({
 		name: "pool",
