@@ -11,7 +11,7 @@ var express = require("express");
 var commander = require("commander");
 var winston = require("winston");
 
-var stats = require("./lib/stats");
+var Stats = require("./lib/stats");
 
 
 //
@@ -33,7 +33,7 @@ http.globalAgent.maxSockets = 10240;
 /**
 * Start up our webserver.
 */
-function startServer(port, data) {
+function startServer(stats, port, data) {
 
 	var app = express();
 
@@ -103,6 +103,8 @@ function timeoutGoGood(data) {
 */
 function main() {
 
+	var stats = new Stats();
+
 	commander
 		.option("--go-bad-after <n>", "Start going bad after n seconds")
 		.option("--go-bad-duration <n>", "How long to stay bad for")
@@ -127,7 +129,7 @@ function main() {
 	data.goBadDuration = commander.goBadDuration * 1000;
 	data.goBadDelay = commander.goBadDelay * 1000;
 	data.bad = false;
-	startServer(port, data);
+	startServer(stats, port, data);
 
 	timeoutGoBad(data);
 

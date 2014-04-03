@@ -8,7 +8,7 @@ var commander = require("commander");
 var express = require("express");
 
 var circuitBreaker = require("./lib/circuitBreaker");
-var stats = require("./lib/stats");
+var Stats = require("./lib/stats");
 var request = require("./lib/request");
 
 
@@ -21,7 +21,7 @@ http.globalAgent.maxSockets = 10240;
 /**
 * Start up our webserver.
 */
-function startServer(port, commander) {
+function startServer(stats, port, commander) {
 
 	var app = express();
 
@@ -41,7 +41,7 @@ function startServer(port, commander) {
 		if (commander.circuitBreaker) {
 			breaker.go(function(cb) {
 				request.handleRequest(
-				req, res, commander.url, commander.clever, cb);
+				req, res, stats, commander.url, commander.clever, cb);
 				},
 			function(error) {
 				//console.log("After!", error); // Debugging
@@ -50,7 +50,7 @@ function startServer(port, commander) {
 
 		} else {
 			request.handleRequest(
-				req, res, commander.url, commander.clever, function() {
+				req, res, stats, commander.url, commander.clever, function() {
 				res.send("Hello", 200);
 				});
 
@@ -81,6 +81,8 @@ function startServer(port, commander) {
 * Our main entry opint.
 */
 function main() {
+
+	var stats = new Stats();
 
 	commander
 		.option("--url <url>", "Url of the bad web service")
@@ -124,7 +126,7 @@ function main() {
 	});
 
 	var port = 3000;
-	startServer(port, commander);
+	startServer(stats, port, commander);
 
 } // End of main()
 

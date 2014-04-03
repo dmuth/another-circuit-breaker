@@ -9,7 +9,7 @@ var commander = require("commander");
 var generic_pool = require("generic-pool");
 var request = require("request");
 
-var stats = require("./lib/stats");
+var Stats = require("./lib/stats");
 
 
 //
@@ -22,6 +22,8 @@ http.globalAgent.maxSockets = 10240;
 * Our main entry opint.
 */
 function main() {
+
+	var stats = new Stats();
 
 	commander
 		.option("--num-requests <n>", "Number of requests to make")
