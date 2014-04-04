@@ -32,6 +32,7 @@ function startServer(stats, port, commander) {
 	options.maxFailures = commander.circuitBreakerMaxFailures;
 	options.min = commander.circuitBreakerMin;
 	options.decayRate = commander.circuitBreakerDecayRate;
+	options.decayAlgorithm = commander.circuitBreakerDecayAlgorithm;
 	options.debug = true;
 	//options.debug = function(str) { console.log("CB DEBUG:", str); };
 
@@ -96,8 +97,10 @@ function main() {
 			"Number of failures before tripping the circuit breaker")
 		.option("--circuit-breaker-min <n>", 
 			"Failures must be below this number before retrying on an open circuit")
+		.option("--circuit-breaker-decay-algorithm <string>", 
+			"Which decay algorithm to use? Can be \"constant\" or \"percent\".")
 		.option("--circuit-breaker-decay-rate <n>",
-			"Errors drop by this number per second")
+			"Errors drop by this rate (number or percent) per second.")
 		.parse(process.argv)
 		;
 	//console.log(commander); // Debugging
@@ -109,6 +112,7 @@ function main() {
 	commander.circuitBreakerTimeout = commander.circuitBreakerTimeout || 1;
 	commander.circuitBreakerMaxFailures = commander.circuitBreakerMaxFailures || 10;
 	commander.circuitBreakerMin = commander.circuitBreakerMin || 0;
+	commander.circuitBreakerDecayAlgorithm = commander.circuitBreakerDecayAlgorithm;
 	commander.circuitBreakerDecayRate = commander.circuitBreakerDecayRate || 1;
 
 	if (commander.statsAvg) {
@@ -119,7 +123,9 @@ function main() {
 		stats.setStdDev("request_time");
 	}
 
-	stats.reportTime();
+	stats.reportTime(function(str) {
+		console.log("Good Server:", str);
+		});
 
 	process.on("uncaughtException", function(error) {
 		//console.log(error, JSON.stringify(error)); // Debugging
