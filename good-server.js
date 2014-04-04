@@ -43,11 +43,11 @@ function startServer(stats, port, commander) {
 		if (commander.circuitBreaker) {
 			breaker.go(function(cb) {
 				request.handleRequest(
-				req, res, stats, commander.url, commander.clever, cb);
+					req, res, stats, commander.url, commander.clever, cb);
 				},
-			function(error) {
-				//console.log("After!", error); // Debugging
-				res.send("Hello", 200);
+				function(error) {
+					//console.log("After!", error); // Debugging
+					res.send("Hello", 200);
 				});
 
 		} else {
