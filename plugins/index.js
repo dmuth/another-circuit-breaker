@@ -27,6 +27,7 @@ for (var k in files) {
 	var module_name = file.match(/(.*).js$/)[1];
 
 	exports[module_name] = func;
+	exports[module_name + ".js"] = func;
 
 }
 
