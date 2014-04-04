@@ -9,7 +9,7 @@ var commander = require("commander");
 var generic_pool = require("generic-pool");
 var request = require("request");
 
-var Stats = require("./lib/stats");
+var Stats = require("../lib/stats");
 
 
 //

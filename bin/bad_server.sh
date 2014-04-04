@@ -18,5 +18,5 @@ echo "Max number of file descriptors: `ulimit -n`"
 
 DIR=`dirname $0`
 
-node ${DIR}/../bad-server.js
+node ${DIR}/bad-server.js
 

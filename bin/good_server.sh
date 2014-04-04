@@ -18,6 +18,6 @@ DIR=`dirname $0`
 
 URL="http://10.0.50.10:3001/"
 
-node ${DIR}/../good-server.js --url ${URL} $@
+node ${DIR}/good-server.js --url ${URL} $@
 
 
