@@ -81,8 +81,7 @@ Existing plugins can be found in the plugins/ directory.  All plugins have this 
     function(stats, options, debug)
 
 
-Want to write a plugin? Try copying the file `example.js` and going from there.
-
+Want to write a plugin? Start by looking in the file `example.js`. Documentation for the stats system can be found there.  Next, make a copy of that file and start writing your plugin.  Be sure to make liberal use of the development environemnt (described below) and the debug function.
 
 
 #### Development environment
