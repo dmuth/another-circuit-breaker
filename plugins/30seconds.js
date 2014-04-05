@@ -19,9 +19,10 @@ var start = 0;
 * Cause our error rate to decay by a specified rate each call.
 *
 * @param {object} stats Our stats object
-* @param {float} decayRate Our rate of decay per call.
+* @param {object} options Our options object
+* @param {function} debug Our debugging funciton
 */
-exports.go = function(stats, decayRate) {
+exports.go = function(stats, options, debug) {
 
 	if (!start) {
 		//
@@ -35,6 +36,7 @@ exports.go = function(stats, decayRate) {
 		// If more than 30 seconds, set errors to zero so
 		// the circuit breaker closes again.
 		var diff = (new Date().getTime() / 1000) - start;
+		debug("30seconds.js: Seconds elapsed: " + diff);
 
 		if (diff >= 30) {
 			stats.set("num-errors", 0);

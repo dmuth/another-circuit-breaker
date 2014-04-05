@@ -8,11 +8,12 @@
 * Cause our error rate to decay by a specified rate each call.
 *
 * @param {object} stats Our stats object
-* @param {float} decayRate Our rate of decay per call.
+* @param {object} options Our options object
+* @param {function} debug Our debugging funciton
 */
-exports.go = function(stats, decayRate) {
+exports.go = function(stats, options, debug) {
 	
-	stats.subAbs("num-errors", decayRate);
+	stats.subAbs("num-errors", options.decayRate);
 
 } // End of go()
 
