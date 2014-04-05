@@ -12,7 +12,14 @@ Your app will crash.  If you're lucky.  If you're not lucky, you'll run out of f
 
     var circuitBreaker = require("./lib/circuitBreaker");
     
-    var options = {};
+    var options = {
+        timeout: 5,
+        maxFailures: 20,
+        min: 0,
+        decayAlgorithm: "percent",
+        decayRate: 10,
+        debug: function(str) { console.log("CircuitBreaker:", str); }
+        };
     var breaker = new circuitBreaker(options); // Only run this ONCE
     
     breaker.go(function(cb) {
@@ -29,8 +36,7 @@ Your app will crash.  If you're lucky.  If you're not lucky, you'll run out of f
 
         })
 
-
-### Options
+#### Options
 
 The options object can be used to alter the behavior of CircuitBreaker.  These are the options available:
 
@@ -62,7 +68,22 @@ Any of these can be chosen with the "decayAlgorithm" option.
 
 ### Writing your own Plugins
 
-Existing plugins can be found in the plugins/ directory.  Try copying the file example.js and going from there.
+Existing plugins can be found in the plugins/ directory.  All plugins have this signature function:
+
+    /**
+    *
+    * @param {object} stats Our stats object
+    * @param {object} options Our options object
+    *    The decay rate can be accessed as options.decayRate
+    * @param {function} debug Our debugging funciton
+    *
+    */
+    function(stats, options, debug)
+
+
+Want to write a plugin? Try copying the file `example.js` and going from there.
+
+
 
 #### Development environment
 
@@ -75,8 +96,16 @@ In order to create scenarios under which CircuitBreaker will be the most useful,
 - bin/good_server.sh - To be run on the "good server" VM, it starts up the good server app. Run with -h for options, such as which CircuitBreaker decay plugin to test.
 - bin/client.sh - To be run on the "client" VM, it makes connections to the good server in parallel, to simulate lots of incoming connections from the outside world. Run with -h for options, such as the concurrency level and total number of connections to make.
 
+##### Installing Node.js on each VM
+
+The latest version of Node.js can be installed on each VM by SSHing in (`vagrant ssh (bad_server|good_server|client)`) and running these commands as root:
+
+    sudo add-apt-repository ppa:chris-lea/node.js
+    sudo apt-get update
+    sudo apt-get install python-software-properties python g++ make nodejs
 
 
 ### Contact
 
-Questions? Complaints? Here's my contact info: http://www.dmuth.org/contact
+Questions? Complaints? Here's my contact info: [http://www.dmuth.org/contact](http://www.dmuth.org/contact)
+
