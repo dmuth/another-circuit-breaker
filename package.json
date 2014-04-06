@@ -4,7 +4,7 @@
   "description": "An implementation of the Circuit Breaker pattern in Node.js, now with plugin support!",
   "scripts": {},
   "author": "Douglas Muth <dmuth@dmuth.org>",
-  "main": "./lib/cirbuitBreaker.js",
+  "main": "./lib/circuitBreaker.js",
   "license": "MIT",
   "dependencies": {
     "request": "~2.34.0",
