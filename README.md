@@ -104,6 +104,12 @@ The latest version of Node.js can be installed on each VM by SSHing in (`vagrant
     sudo apt-get install python-software-properties python g++ make nodejs
 
 
+### Where to find this project online
+
+- [https://github.com/dmuth/another-circuit-breaker](https://github.com/dmuth/another-circuit-breaker)
+- [https://bitbucket.org/dmuth/another-circuit-breaker](https://bitbucket.org/dmuth/another-circuit-breaker)
+
+
 ### Contact
 
 Questions? Complaints? Here's my contact info: [http://www.dmuth.org/contact](http://www.dmuth.org/contact)
