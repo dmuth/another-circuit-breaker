@@ -108,8 +108,3 @@ The latest version of Node.js can be installed on each VM by SSHing in (`vagrant
 
 Questions? Complaints? Here's my contact info: [http://www.dmuth.org/contact](http://www.dmuth.org/contact)
 
-=======
-another-circuit-breaker
-=======================
-
-This module implements the "Circuit Breaker" pattern, which is used to detect failures and prevent a failure from occurring regularly. 
