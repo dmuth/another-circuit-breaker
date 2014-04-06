@@ -5,7 +5,7 @@
   "scripts": {},
   "author": "Douglas Muth <dmuth@dmuth.org>",
   "main": "./lib/cirbuitBreaker.js",
-  "license": "GPL",
+  "license": "MIT",
   "dependencies": {
     "request": "~2.34.0",
     "commander": "~2.1.0",
