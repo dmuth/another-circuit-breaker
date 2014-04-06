@@ -5,7 +5,7 @@ This module implements the "Circuit Breaker" pattern, which is used to detect fa
 
 ### The Consequences of undeteted failures
 
-Your app will crash.  If you're lucky.  If you're not lucky, you'll run out of file descriptors and other file or network-based operations in your program will be affected.  If you're **really** unlucky, you'll start hitting the swap space and then run out of RAM, thus invoking ~~Zalgo~~ the OOM killer which then might kill syslog or worse?  You don't want to be there.
+Your app will crash.  If you're lucky.  If you're not lucky, you'll run out of file descriptors and other file or network-based operations in your program will be affected.  If you're **really** unlucky, you'll start hitting the swap space and then run out of RAM, thus ~~unleashing Zalgo~~ the OOM killer which then might kill syslog or worse?  You don't want to be there.
 
 
 ### Usage
@@ -108,3 +108,8 @@ The latest version of Node.js can be installed on each VM by SSHing in (`vagrant
 
 Questions? Complaints? Here's my contact info: [http://www.dmuth.org/contact](http://www.dmuth.org/contact)
 
+=======
+another-circuit-breaker
+=======================
+
+This module implements the "Circuit Breaker" pattern, which is used to detect failures and prevent a failure from occurring regularly. 
