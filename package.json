@@ -1,6 +1,6 @@
 {
   "name": "another-circuit-breaker",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "An implementation of the Circuit Breaker pattern in Node.js, now with plugin support!",
   "scripts": {},
   "author": "Douglas Muth <dmuth@dmuth.org>",
