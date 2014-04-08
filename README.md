@@ -7,10 +7,14 @@ This module implements the "Circuit Breaker" pattern, which is used to detect fa
 
 Your app will crash.  If you're lucky.  If you're not lucky, you'll run out of file descriptors and other file or network-based operations in your program will be affected.  If you're **really** unlucky, you'll start hitting the swap space and then run out of RAM, thus ~~unleashing Zalgo~~ the OOM killer which then might kill syslog or worse?  You don't want to be there.
 
+### Installation
+
+`npm install another-circuit-breaker`
+
 
 ### Usage
 
-    var circuitBreaker = require("./lib/circuitBreaker");
+    var circuitBreaker = require("another-circuit-breaker");
     
     var options = {
         timeout: 5,
@@ -49,7 +53,7 @@ The options object can be used to alter the behavior of CircuitBreaker.  These a
 - debug: Set to true to see debug messages printed out once every second. Set to a function and the function will be called once every second instead. (default: false)
 
     
-### ""Decaying? What's that?"
+### "Decaying? What's that?"
 
 In this context, "decaying" means to lower the number of errors stored in CircuitBreaker every second.  This is done so that once a service has thrown errors or timed out too many times, a certain "cooling off period" is enforced, based on the number of errors caught.
     
@@ -87,13 +91,14 @@ Want to write a plugin? Start by looking in the file `example.js`. Documentation
 #### Development environment
 
 In order to create scenarios under which CircuitBreaker will be the most useful, I took the liberty of creating a development environment.  That consists of the following files:
-- Vagrantfile - Used in conjction with Vagrant to create 3 separate virtual machines: 
+
+- `Vagrantfile` - Used in conjction with Vagrant to create 3 separate virtual machines: 
    - A "bad_server" which periodically takes a long time to reply to queries
    - A "good_server" which accepts HTTP connections and makes HTTP connections to the bad server, and uses CircuitBreaker
    - A "client", which is used to connect to the good server.
-- bin/bad_server.sh - To be run on the "bad server" VM, it starts up the node.js server app.
-- bin/good_server.sh - To be run on the "good server" VM, it starts up the good server app. Run with -h for options, such as which CircuitBreaker decay plugin to test.
-- bin/client.sh - To be run on the "client" VM, it makes connections to the good server in parallel, to simulate lots of incoming connections from the outside world. Run with -h for options, such as the concurrency level and total number of connections to make.
+- `bin/bad_server.sh` - To be run on the "bad server" VM, it starts up the node.js server app. Run with `-h` for options. By default, the server toggles between "good" and "bad" states every 5 seconds.  During a "bad" state, the server waits 5000 ms before replying to a query. This simulates a web service with excessive delays.
+- `bin/good_server.sh` - To be run on the "good server" VM, it starts up the good server app. Run with `-h` for options, such as which CircuitBreaker decay plugin to test.
+- `bin/client.sh` - To be run on the "client" VM, it makes connections to the good server in parallel, to simulate lots of incoming connections from the outside world. Run with `-h` for options, such as the concurrency level and total number of connections to make.
 
 ##### Installing Node.js on each VM
 
