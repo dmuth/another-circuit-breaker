@@ -10,7 +10,7 @@
     "request": "~2.34.0",
     "commander": "~2.1.0",
     "winston": "~0.7.2",
-    "express": "~3.5.0",
+    "express": "~4.17.1",
     "async": "~0.2.10",
     "generic-pool": "~2.0.4"
   }
