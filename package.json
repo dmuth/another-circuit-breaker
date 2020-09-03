@@ -7,7 +7,7 @@
   "main": "./lib/circuitBreaker.js",
   "license": "MIT",
   "dependencies": {
-    "request": "~2.34.0",
+    "request": "~2.88.2",
     "commander": "~2.1.0",
     "winston": "~0.7.2",
     "express": "~3.5.0",
